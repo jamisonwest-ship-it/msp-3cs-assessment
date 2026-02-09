@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { assessmentSubmitSchema } from "@/lib/validation";
 import { computeFinalRating, getGrade } from "@/lib/scoring";
-import { GUIDANCE } from "@/lib/guidance";
+import { generateGuidance } from "@/lib/guidance";
 import { renderPersonPDFToBuffer } from "@/lib/pdf";
 import { buildAssessmentEmailHTML } from "@/lib/email";
 import { sendAssessmentEmail } from "@/lib/email-sender";
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         commitment: p.commitment,
       })!;
       const grade = getGrade(finalRating);
-      const guidance = GUIDANCE[grade];
+      const guidance = generateGuidance(p.culture, p.competence, p.commitment, grade);
       return {
         ...p,
         finalRating,
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           name: r.name,
           finalRating: r.finalRating,
           grade: r.grade,
-          guidance: GUIDANCE[r.grade].summary,
+          guidance: generateGuidance(r.culture, r.competence, r.commitment, r.grade).summary,
         })),
         warning: "Assessment saved but email delivery failed. You can still view results via the history link.",
       });
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
         name: r.name,
         finalRating: r.finalRating,
         grade: r.grade,
-        guidance: GUIDANCE[r.grade].summary,
+        guidance: generateGuidance(r.culture, r.competence, r.commitment, r.grade).summary,
       })),
     });
   } catch (err) {

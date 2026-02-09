@@ -16,19 +16,25 @@ const colorMap = {
     bg: "bg-msp-blue",
     text: "text-msp-blue",
     ring: "ring-msp-blue/30",
-    gradient: "from-msp-blue-light to-msp-blue",
+    gradient: "from-th-blue-tint to-msp-blue",
+    labelBg: "bg-th-blue-tint",
+    labelBorder: "border-msp-blue/20",
   },
   green: {
     bg: "bg-msp-green",
     text: "text-msp-green",
     ring: "ring-msp-green/30",
-    gradient: "from-msp-green-light to-msp-green",
+    gradient: "from-th-green-tint to-msp-green",
+    labelBg: "bg-th-green-tint",
+    labelBorder: "border-msp-green/20",
   },
   primary: {
-    bg: "bg-msp-primary",
-    text: "text-msp-primary",
-    ring: "ring-msp-primary/30",
-    gradient: "from-gray-200 to-msp-primary",
+    bg: "bg-th-commit",
+    text: "text-th-commit",
+    ring: "ring-th-commit/30",
+    gradient: "from-th-commit-tint to-th-commit",
+    labelBg: "bg-th-commit-tint",
+    labelBorder: "border-th-commit/20",
   },
 };
 
@@ -48,9 +54,13 @@ export function PremiumSlider({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
         <span
-          className={`flex h-8 w-8 items-center justify-center rounded-full ${colors.bg} text-sm font-bold text-white shadow-sm`}
+          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase ${colors.labelBg} ${colors.labelBorder} ${colors.text}`}
+        >
+          {label}
+        </span>
+        <span
+          className={`flex h-8 w-8 items-center justify-center rounded-lg ${colors.bg} text-sm font-bold text-white shadow-sm`}
         >
           {value}
         </span>
@@ -58,7 +68,7 @@ export function PremiumSlider({
 
       <div className="relative">
         <div className="pointer-events-none absolute inset-0 flex items-center px-0.5">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-th-muted/20">
             <div
               className={`h-full rounded-full bg-gradient-to-r ${colors.gradient} transition-all duration-150`}
               style={{ width: `${percentage}%` }}
@@ -86,13 +96,13 @@ export function PremiumSlider({
         </div>
       </div>
 
-      <div className="flex justify-between text-xs text-gray-400">
+      <div className="flex justify-between text-xs text-th-muted">
         <span>{min}</span>
         <span>{max}</span>
       </div>
 
       {helperText && (
-        <p className={`text-xs ${colors.text} font-medium`}>{helperText}</p>
+        <p className={`text-xs ${colors.text} font-medium leading-snug`}>{helperText}</p>
       )}
     </div>
   );

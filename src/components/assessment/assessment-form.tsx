@@ -37,7 +37,14 @@ export function AssessmentForm() {
   const updatePerson = useCallback(
     (id: string, field: keyof PersonData, value: string | number) => {
       setPeople((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+        prev.map((p) => {
+          if (p.id !== id) return p;
+          const update: Partial<PersonData> = { [field]: value };
+          if (field === "culture") update.cultureTouched = true;
+          if (field === "competence") update.competenceTouched = true;
+          if (field === "commitment") update.commitmentTouched = true;
+          return { ...p, ...update };
+        })
       );
     },
     []
@@ -101,39 +108,44 @@ export function AssessmentForm() {
   return (
     <div className="space-y-8">
       {/* Assessor email */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <label className="block text-sm font-medium text-gray-700">
-          Your email address
-        </label>
-        <p className="mt-1 text-xs text-gray-500">
-          Results will be sent to this address.
+      <div className="rounded-xl border border-th-border bg-th-surface p-6 shadow-sm">
+        <div className="flex items-center gap-2">
+          <svg className="h-4 w-4 text-th-muted" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+          </svg>
+          <label className="block text-sm font-semibold text-th-text">
+            Your email address
+          </label>
+        </div>
+        <p className="mt-1 text-xs text-th-muted">
+          PDF reports and a history link will be sent here.
         </p>
         <input
           type="email"
           value={assessorEmail}
           onChange={(e) => setAssessorEmail(e.target.value)}
           placeholder="assessor@company.com"
-          className={`mt-2 w-full max-w-md rounded-lg border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+          className={`mt-3 w-full max-w-md rounded-lg border px-4 py-2.5 text-sm bg-th-surface text-th-text placeholder-th-muted focus:outline-none focus:ring-2 ${
             assessorEmail && !isValidEmail
-              ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-              : "border-gray-300 focus:border-msp-blue focus:ring-msp-blue/20"
+              ? "border-red-500/40 focus:border-red-500 focus:ring-red-500/20"
+              : "border-th-muted/25 focus:border-msp-blue focus:ring-msp-blue/20"
           }`}
         />
         {assessorEmail && !isValidEmail && (
-          <p className="mt-1 text-xs text-red-500">Please enter a valid email address.</p>
+          <p className="mt-1.5 text-xs text-red-500">Please enter a valid email address.</p>
         )}
       </div>
 
       {/* People cards */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-msp-primary">
+          <h2 className="text-lg font-semibold text-th-text">
             People to Assess ({people.length}/{MAX_PEOPLE})
           </h2>
           <div className="flex gap-2">
             <button
               onClick={resetAll}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="rounded-lg border border-th-border px-4 py-2 text-sm font-medium text-th-muted hover:bg-th-subtle transition-colors"
             >
               Reset All
             </button>
@@ -163,40 +175,47 @@ export function AssessmentForm() {
       <ResultsPreview people={people} />
 
       {/* Submit */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="rounded-lg bg-msp-blue px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:bg-msp-blue-dark hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-        >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Submitting...
-            </span>
-          ) : (
-            "Submit & Email Results"
-          )}
-        </button>
+      <div className="rounded-xl border border-th-border bg-th-surface p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-msp-blue px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:bg-msp-blue-dark hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+          >
+            {isSubmitting ? (
+              <>
+                <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Submitting...
+              </>
+            ) : (
+              <>
+                Submit & Email Results
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+              </>
+            )}
+          </button>
 
-        {!canSubmit && !isSubmitting && (
-          <p className="text-sm text-gray-500">
-            {!isValidEmail
-              ? "Enter a valid email to continue."
-              : scoredPeople.length === 0
-              ? "Add at least one person with a name to continue."
-              : ""}
-          </p>
-        )}
+          {!canSubmit && !isSubmitting && (
+            <p className="text-sm text-th-muted">
+              {!isValidEmail
+                ? "Enter a valid email to continue."
+                : scoredPeople.length === 0
+                ? "Add at least one person with a name to continue."
+                : ""}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4">
+          <p className="text-sm text-red-500">{error}</p>
         </div>
       )}
     </div>

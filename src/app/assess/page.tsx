@@ -10,9 +10,9 @@ export default function AssessPage() {
       <main className="flex-1 py-8">
         <div className="mx-auto max-w-4xl px-4">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-msp-primary">3Cs Assessment</h1>
-            <p className="mt-2 text-gray-600">
-              Score each person on Culture, Competence, and Commitment. Results update live.
+            <h1 className="text-3xl font-bold text-th-text">3Cs Assessment</h1>
+            <p className="mt-2 text-th-muted">
+              Score each person on <span className="font-medium text-msp-blue">Culture</span>, <span className="font-medium text-msp-green">Competence</span>, and <span className="font-medium text-th-commit">Commitment</span>. Results update live.
             </p>
           </div>
 

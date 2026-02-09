@@ -9,7 +9,7 @@ import {
   renderToBuffer,
 } from "@react-pdf/renderer";
 import type { Grade } from "./scoring";
-import { GUIDANCE } from "./guidance";
+import { generateGuidance } from "./guidance";
 
 const BRAND = {
   primary: "#000033",
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 120,
-    height: 40,
+    height: 32,
   },
   logoPlaceholder: {
     fontSize: 18,
@@ -100,21 +100,6 @@ const styles = StyleSheet.create({
     backgroundColor: BRAND.lightGray,
     borderRadius: 8,
   },
-  ratingBox: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 80,
-  },
-  ratingValue: {
-    fontSize: 36,
-    fontFamily: "Helvetica-Bold",
-    color: BRAND.primary,
-  },
-  ratingLabel: {
-    fontSize: 9,
-    color: BRAND.gray,
-    marginTop: 2,
-  },
   gradeBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -129,14 +114,21 @@ const styles = StyleSheet.create({
   guidanceSection: {
     marginTop: 10,
   },
-  guidanceTitle: {
+  guidanceSectionTitle: {
     fontSize: 14,
     fontFamily: "Helvetica-Bold",
     color: BRAND.primary,
     marginBottom: 8,
   },
-  guidanceText: {
+  guidanceSubTitle: {
     fontSize: 11,
+    fontFamily: "Helvetica-Bold",
+    color: BRAND.blue,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  guidanceText: {
+    fontSize: 10,
     color: BRAND.gray,
     lineHeight: 1.6,
   },
@@ -179,13 +171,12 @@ export function PersonPDF({
   culture,
   competence,
   commitment,
-  finalRating,
   grade,
   assessorEmail,
   dateTime,
   logoBase64,
 }: PersonPDFProps) {
-  const guidance = GUIDANCE[grade];
+  const guidance = generateGuidance(culture, competence, commitment, grade);
 
   return (
     <Document>
@@ -232,12 +223,8 @@ export function PersonPDF({
           </View>
         </View>
 
-        {/* Final Rating + Grade */}
+        {/* Grade */}
         <View style={styles.resultSection}>
-          <View style={styles.ratingBox}>
-            <Text style={styles.ratingValue}>{finalRating}</Text>
-            <Text style={styles.ratingLabel}>Final Rating</Text>
-          </View>
           <View style={{ justifyContent: "center", flex: 1 }}>
             <View
               style={[
@@ -260,10 +247,20 @@ export function PersonPDF({
           </View>
         </View>
 
-        {/* Guidance */}
+        {/* Diagnostic Guidance — 3 sections */}
         <View style={styles.guidanceSection}>
-          <Text style={styles.guidanceTitle}>Assessment Guidance</Text>
-          <Text style={styles.guidanceText}>{guidance.detail}</Text>
+          <Text style={styles.guidanceSectionTitle}>Assessment Guidance</Text>
+
+          <Text style={styles.guidanceSubTitle}>Primary Coaching Focus</Text>
+          <Text style={styles.guidanceText}>{guidance.primaryFocus}</Text>
+
+          <Text style={styles.guidanceSubTitle}>Manager Action Guidance</Text>
+          <Text style={styles.guidanceText}>{guidance.managerActions}</Text>
+
+          <Text style={styles.guidanceSubTitle}>Strength Reinforcement</Text>
+          <Text style={styles.guidanceText}>
+            {guidance.strengthReinforcement}
+          </Text>
         </View>
 
         {/* Footer */}

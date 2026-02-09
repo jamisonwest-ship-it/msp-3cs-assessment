@@ -1,5 +1,5 @@
 import type { Grade } from "./scoring";
-import { GUIDANCE } from "./guidance";
+import { generateGuidance } from "./guidance";
 
 const BRAND = {
   primary: "#000033",
@@ -47,7 +47,7 @@ export function buildAssessmentEmailHTML(options: EmailTemplateOptions): string 
         <td style="padding: 10px 12px; border-bottom: 1px solid #E5E7EB; text-align: center;">
           <span style="display: inline-block; padding: 2px 10px; border-radius: 12px; background: ${gradeColors[p.grade]}; color: white; font-weight: 700; font-size: 13px;">${p.grade}</span>
         </td>
-        <td style="padding: 10px 12px; border-bottom: 1px solid #E5E7EB; font-size: 12px; color: #6B7280;">${GUIDANCE[p.grade].summary}</td>
+        <td style="padding: 10px 12px; border-bottom: 1px solid #E5E7EB; font-size: 12px; color: #6B7280;">${generateGuidance(p.culture, p.competence, p.commitment, p.grade).summary}</td>
       </tr>`
     )
     .join("");

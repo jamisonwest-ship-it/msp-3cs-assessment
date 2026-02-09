@@ -1,38 +1,89 @@
 @import "tailwindcss";
 
-@theme {
-  /* MSP+ Brand Colors */
-  --color-msp-primary: #000033;
-  --color-msp-blue: #0071BD;
-  --color-msp-green: #4BAA42;
+@custom-variant dark (&:where(.dark, .dark *));
 
-  /* Derived shades */
-  --color-msp-primary-light: #1a1a4d;
-  --color-msp-blue-light: #e6f2fb;
-  --color-msp-green-light: #e8f5e7;
+/* ──── Theme Tokens ──── */
+
+:root {
+  --th-bg: #f4fbfb;
+  --th-surface: #ffffff;
+  --th-surface2: #edf6f6;
+  --th-border: rgba(69, 83, 98, 0.15);
+  --th-text: #000033;
+  --th-muted: #455362;
+  --th-subtle: rgba(69, 83, 98, 0.06);
+  --th-commit: #000033;
+  --th-commit-tint: rgba(0, 0, 51, 0.07);
+  --th-blue-tint: #dfedf7;
+  --th-green-tint: #e0f0de;
+  --th-logo-filter: none;
+}
+
+.dark {
+  --th-bg: #001833;
+  --th-surface: #001931;
+  --th-surface2: #002244;
+  --th-border: rgba(100, 120, 140, 0.3);
+  --th-text: #f4fbfb;
+  --th-muted: #8899aa;
+  --th-subtle: rgba(244, 251, 251, 0.05);
+  --th-commit: #8088c0;
+  --th-commit-tint: rgba(128, 136, 192, 0.15);
+  --th-blue-tint: rgba(0, 113, 189, 0.15);
+  --th-green-tint: rgba(75, 170, 66, 0.15);
+  --th-logo-filter: brightness(0) invert(1);
+}
+
+/* ──── Tailwind: dynamic theme colors ──── */
+
+@theme inline {
+  --color-th-bg: var(--th-bg);
+  --color-th-surface: var(--th-surface);
+  --color-th-surface2: var(--th-surface2);
+  --color-th-border: var(--th-border);
+  --color-th-text: var(--th-text);
+  --color-th-muted: var(--th-muted);
+  --color-th-subtle: var(--th-subtle);
+  --color-th-commit: var(--th-commit);
+  --color-th-commit-tint: var(--th-commit-tint);
+  --color-th-blue-tint: var(--th-blue-tint);
+  --color-th-green-tint: var(--th-green-tint);
+}
+
+/* ──── Tailwind: static brand colors ──── */
+
+@theme {
+  --color-msp-blue: #0071bd;
+  --color-msp-green: #4baa42;
   --color-msp-blue-dark: #005a97;
   --color-msp-green-dark: #3c8a35;
 
-  /* Grade colors */
-  --color-grade-aplus: #16a34a;
-  --color-grade-a: #22c55e;
-  --color-grade-b: #eab308;
-  --color-grade-c: #f97316;
-  --color-grade-d: #ef4444;
+  /* Grade palette — brand-aligned */
+  --color-grade-aplus: #2d8a37;
+  --color-grade-a: #0071bd;
+  --color-grade-b: #3d7a8a;
+  --color-grade-c: #7d6b2e;
+  --color-grade-d: #8b3a3a;
 }
+
+/* ──── Base ──── */
 
 body {
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  color: var(--color-msp-primary);
+  color: var(--th-text);
+  background-color: var(--th-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Premium slider styling */
+/* ──── Range input (native hidden, kept for a11y) ──── */
+
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   height: 8px;
   border-radius: 4px;
-  background: #e2e8f0;
+  background: transparent;
   outline: none;
 }
 

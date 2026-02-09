@@ -2,7 +2,7 @@
 
 import { GradeBadge } from "@/components/ui/badge";
 import { computeScore } from "@/lib/scoring";
-import { GUIDANCE } from "@/lib/guidance";
+import { generateGuidance } from "@/lib/guidance";
 import type { PersonData } from "./person-card";
 
 interface ResultsPreviewProps {
@@ -11,7 +11,7 @@ interface ResultsPreviewProps {
 
 export function ResultsPreview({ people }: ResultsPreviewProps) {
   const scoredPeople = people
-    .filter((p) => p.name.trim())
+    .filter((p) => p.name.trim() && p.cultureTouched && p.competenceTouched && p.commitmentTouched)
     .map((p) => ({
       ...p,
       score: computeScore({
@@ -26,42 +26,42 @@ export function ResultsPreview({ people }: ResultsPreviewProps) {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-msp-primary">Results Summary</h2>
-      <p className="mt-1 text-sm text-gray-500">Live preview — updates as you score</p>
+    <div className="rounded-xl border border-th-border bg-th-surface shadow-sm">
+      <div className="border-b border-th-border px-6 py-4">
+        <h2 className="text-lg font-semibold text-th-text">Results Summary</h2>
+        <p className="mt-0.5 text-sm text-th-muted">Live preview — updates as you score</p>
+      </div>
 
-      <div className="mt-4 overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-              <th className="pb-3 pr-4">Name</th>
-              <th className="pb-3 pr-4 text-center">Culture</th>
-              <th className="pb-3 pr-4 text-center">Competence</th>
-              <th className="pb-3 pr-4 text-center">Commitment</th>
-              <th className="pb-3 pr-4 text-center">Rating</th>
-              <th className="pb-3 pr-4 text-center">Grade</th>
-              <th className="pb-3">Guidance</th>
+            <tr className="border-b border-th-border bg-th-subtle text-left text-[11px] font-semibold uppercase tracking-wider">
+              <th className="px-6 py-3 text-th-muted">Name</th>
+              <th className="px-4 py-3 text-center text-msp-blue">Culture</th>
+              <th className="px-4 py-3 text-center text-msp-green">Competence</th>
+              <th className="px-4 py-3 text-center text-th-commit">Commitment</th>
+              <th className="px-4 py-3 text-center text-th-muted">Grade</th>
+              <th className="px-6 py-3 text-th-muted">Guidance</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-th-border">
             {scoredPeople.map((p) => {
-              const guidance = p.score ? GUIDANCE[p.score.grade] : null;
+              const guidance = p.score
+                ? generateGuidance(p.culture, p.competence, p.commitment, p.score.grade)
+                : null;
               return (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="py-3 pr-4 font-medium text-msp-primary">
-                    {p.name || "—"}
+                <tr key={p.id} className="hover:bg-th-subtle transition-colors">
+                  <td className="px-6 py-3.5 font-medium text-th-text">
+                    {p.name || "\u2014"}
                   </td>
-                  <td className="py-3 pr-4 text-center">{p.culture}</td>
-                  <td className="py-3 pr-4 text-center">{p.competence}</td>
-                  <td className="py-3 pr-4 text-center">{p.commitment}</td>
-                  <td className="py-3 pr-4 text-center font-bold">
-                    {p.score?.finalRating ?? "—"}
+                  <td className="px-4 py-3.5 text-center font-semibold text-msp-blue">{p.culture}</td>
+                  <td className="px-4 py-3.5 text-center font-semibold text-msp-green">{p.competence}</td>
+                  <td className="px-4 py-3.5 text-center font-semibold text-th-commit">{p.commitment}</td>
+                  <td className="px-4 py-3.5 text-center">
+                    {p.score ? <GradeBadge grade={p.score.grade} size="sm" /> : "\u2014"}
                   </td>
-                  <td className="py-3 pr-4 text-center">
-                    {p.score ? <GradeBadge grade={p.score.grade} size="sm" /> : "—"}
-                  </td>
-                  <td className="py-3 text-xs text-gray-500">
-                    {guidance?.summary ?? "—"}
+                  <td className="px-6 py-3.5 text-xs leading-relaxed text-th-muted">
+                    {guidance?.summary ?? "\u2014"}
                   </td>
                 </tr>
               );

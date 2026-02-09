@@ -19,18 +19,18 @@ function CompletionContent() {
         </svg>
       </div>
 
-      <h1 className="mt-6 text-3xl font-bold text-msp-primary">Assessment Submitted!</h1>
-      <p className="mt-3 text-gray-600">
+      <h1 className="mt-6 text-3xl font-bold text-th-text">Assessment Submitted!</h1>
+      <p className="mt-3 text-th-muted">
         Your 3Cs Assessment results have been saved and an email with PDF reports is on its way.
       </p>
 
       {token && (
-        <div className="mt-8 rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700">Your Assessment History Link</h2>
-          <p className="mt-1 text-xs text-gray-500">
+        <div className="mt-8 rounded-xl border border-th-border bg-th-surface p-6 text-left shadow-sm">
+          <h2 className="text-sm font-semibold text-th-text">Your Assessment History Link</h2>
+          <p className="mt-1 text-xs text-th-muted">
             Bookmark this link to access your results and download PDFs anytime.
           </p>
-          <div className="mt-3 overflow-hidden rounded-lg bg-gray-50 p-3">
+          <div className="mt-3 overflow-hidden rounded-lg bg-th-surface2 p-3">
             <Link
               href={`/history/${token}`}
               className="text-sm font-medium text-msp-blue hover:underline break-all"
@@ -51,7 +51,7 @@ function CompletionContent() {
         {token && (
           <Link
             href={`/history/${token}`}
-            className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+            className="rounded-lg border border-th-border px-6 py-3 text-sm font-semibold text-th-text hover:bg-th-subtle transition-colors"
           >
             View Results
           </Link>
@@ -66,7 +66,7 @@ export default function CompletePage() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex flex-1 items-center justify-center px-4 py-16">
-        <Suspense fallback={<div className="text-center text-gray-500">Loading...</div>}>
+        <Suspense fallback={<div className="text-center text-th-muted">Loading...</div>}>
           <CompletionContent />
         </Suspense>
       </main>

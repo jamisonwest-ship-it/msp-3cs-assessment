@@ -1,11 +1,11 @@
 import type { Grade } from "@/lib/scoring";
 
 const gradeStyles: Record<Grade, string> = {
-  "A+": "bg-grade-aplus text-white",
-  A: "bg-grade-a text-white",
-  B: "bg-grade-b text-white",
-  C: "bg-grade-c text-white",
-  D: "bg-grade-d text-white",
+  "A+": "bg-grade-aplus text-white shadow-grade-aplus/30",
+  A: "bg-grade-a text-white shadow-grade-a/30",
+  B: "bg-grade-b text-white shadow-grade-b/30",
+  C: "bg-grade-c text-white shadow-grade-c/30",
+  D: "bg-grade-d text-white shadow-grade-d/30",
 };
 
 interface GradeBadgeProps {
@@ -15,14 +15,14 @@ interface GradeBadgeProps {
 
 export function GradeBadge({ grade, size = "md" }: GradeBadgeProps) {
   const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs",
-    md: "px-3 py-1 text-sm",
-    lg: "px-4 py-1.5 text-base",
+    sm: "h-7 w-7 text-xs",
+    md: "h-9 w-9 text-sm",
+    lg: "h-11 w-11 text-base",
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-full font-bold ${gradeStyles[grade]} ${sizeClasses[size]}`}
+      className={`inline-flex items-center justify-center rounded-lg font-extrabold shadow-sm ${gradeStyles[grade]} ${sizeClasses[size]}`}
     >
       {grade}
     </span>

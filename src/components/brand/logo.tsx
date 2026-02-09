@@ -15,7 +15,7 @@ export function Logo({ className = "", width = 180, height = 60 }: LogoProps) {
   if (imgError) {
     return (
       <span
-        className={`inline-flex items-center text-2xl font-bold text-msp-primary ${className}`}
+        className={`inline-flex items-center text-2xl font-bold text-th-text ${className}`}
         style={{ width, height }}
       >
         MSP<span className="text-msp-blue">+</span>
@@ -30,6 +30,7 @@ export function Logo({ className = "", width = 180, height = 60 }: LogoProps) {
       width={width}
       height={height}
       className={className}
+      style={{ filter: "var(--th-logo-filter)" }}
       priority
       onError={() => setImgError(true)}
     />

@@ -2,8 +2,9 @@
 
 import { PremiumSlider } from "@/components/ui/slider";
 import { GradeBadge } from "@/components/ui/badge";
+import { GuidancePanel } from "@/components/ui/guidance-panel";
 import { computeScore } from "@/lib/scoring";
-import { GUIDANCE, CULTURE_LABELS, COMPETENCE_LABELS, COMMITMENT_LABELS } from "@/lib/guidance";
+import { generateGuidance, CULTURE_LABELS, COMPETENCE_LABELS, COMMITMENT_LABELS } from "@/lib/guidance";
 
 export interface PersonData {
   id: string;
@@ -11,6 +12,9 @@ export interface PersonData {
   culture: number;
   competence: number;
   commitment: number;
+  cultureTouched?: boolean;
+  competenceTouched?: boolean;
+  commitmentTouched?: boolean;
 }
 
 interface PersonCardProps {
@@ -28,14 +32,16 @@ export function PersonCard({ person, index, onUpdate, onRemove, canRemove }: Per
     commitment: person.commitment,
   });
 
-  const guidance = score ? GUIDANCE[score.grade] : null;
+  const guidance = score
+    ? generateGuidance(person.culture, person.competence, person.commitment, score.grade)
+    : null;
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+    <div className="rounded-xl border border-th-border bg-th-surface p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-msp-primary text-sm font-bold text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-msp-blue text-sm font-bold text-white">
               {index + 1}
             </span>
             <input
@@ -43,7 +49,7 @@ export function PersonCard({ person, index, onUpdate, onRemove, canRemove }: Per
               value={person.name}
               onChange={(e) => onUpdate(person.id, "name", e.target.value)}
               placeholder="Person's name"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-msp-primary placeholder-gray-400 focus:border-msp-blue focus:outline-none focus:ring-2 focus:ring-msp-blue/20"
+              className="flex-1 rounded-lg border border-th-muted/25 bg-th-surface px-3 py-2 text-sm font-medium text-th-text placeholder-th-muted focus:border-msp-blue focus:outline-none focus:ring-2 focus:ring-msp-blue/20"
             />
           </div>
         </div>
@@ -51,7 +57,7 @@ export function PersonCard({ person, index, onUpdate, onRemove, canRemove }: Per
         {canRemove && (
           <button
             onClick={() => onRemove(person.id)}
-            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+            className="rounded-lg p-2 text-th-muted hover:bg-red-500/10 hover:text-red-500 transition-colors"
             title="Remove person"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -91,18 +97,17 @@ export function PersonCard({ person, index, onUpdate, onRemove, canRemove }: Per
         />
       </div>
 
-      {/* Live result */}
-      {score && (
-        <div className="mt-6 flex items-center gap-4 rounded-lg bg-gray-50 p-4">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-msp-primary">{score.finalRating}</div>
-            <div className="text-xs text-gray-500">Score</div>
+      {/* Live result — only shown after all 3 sliders are touched */}
+      {score && guidance && person.cultureTouched && person.competenceTouched && person.commitmentTouched && (
+        <div className="mt-6 rounded-lg border border-th-border bg-gradient-to-r from-th-surface2 to-th-surface p-4">
+          <div className="flex items-start gap-4 mb-4">
+            <GradeBadge grade={score.grade} size="lg" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-th-text">{guidance.label}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-th-muted">{guidance.summary}</p>
+            </div>
           </div>
-          <GradeBadge grade={score.grade} size="lg" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-700">{guidance?.label}</p>
-            <p className="text-xs text-gray-500">{guidance?.summary}</p>
-          </div>
+          <GuidancePanel guidance={guidance} compact />
         </div>
       )}
     </div>
