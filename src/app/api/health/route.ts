@@ -1,9 +1,17 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 // Lightweight health check that pings Supabase to prevent hobby-tier pausing.
-// Called by Vercel Cron (see vercel.json) every 5 days.
-export async function GET() {
+// Called by Vercel Cron (see vercel.json) every 12 hours.
+export async function GET(request: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const authHeader = request.headers.get("authorization");
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   try {
     const supabase = getSupabaseAdmin();
 
