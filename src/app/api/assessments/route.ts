@@ -6,11 +6,25 @@ import { renderPersonPDFToBuffer } from "@/lib/pdf";
 import { buildAssessmentEmailHTML } from "@/lib/email";
 import { sendAssessmentEmail } from "@/lib/email-sender";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 60; // Allow up to 60s for PDF generation + email
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting (5 submissions per 15 min per IP)
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { allowed, retryAfterMs } = checkRateLimit(ip);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(Math.ceil((retryAfterMs || 60000) / 1000)) },
+        }
+      );
+    }
+
     const body = await request.json();
 
     // Validate input
@@ -45,7 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Compute scores and prepare results
+    // 2. Compute scores and prepare results (store guidance to avoid recomputing)
     const results = people.map((p) => {
       const finalRating = computeFinalRating({
         culture: p.culture,
@@ -59,6 +73,7 @@ export async function POST(request: NextRequest) {
         finalRating,
         grade,
         guidanceKey: guidance.key,
+        guidanceSummary: guidance.summary,
       };
     });
 
@@ -87,10 +102,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Generate PDFs and upload to storage
-    const pdfBuffers: { name: string; buffer: Buffer; personId: string }[] = [];
-
-    // Try to load logo for PDF
+    // 4. Generate PDFs and upload to storage (in parallel)
     let logoBase64: string | undefined;
     try {
       const fs = await import("fs");
@@ -104,48 +116,50 @@ export async function POST(request: NextRequest) {
       // Logo not available, PDF will use text fallback
     }
 
-    for (let i = 0; i < results.length; i++) {
-      const r = results[i];
-      const personId = insertedPeople[i].id;
+    const pdfBuffers = await Promise.all(
+      results.map(async (r, i) => {
+        const personId = insertedPeople[i].id;
 
-      const buffer = await renderPersonPDFToBuffer({
-        personName: r.name,
-        culture: r.culture,
-        competence: r.competence,
-        commitment: r.commitment,
-        finalRating: r.finalRating,
-        grade: r.grade,
-        assessorEmail,
-        dateTime,
-        logoBase64,
-      });
-
-      // Upload to Supabase Storage
-      const storagePath = `${assessment.id}/${personId}.pdf`;
-      const { error: uploadError } = await supabase.storage
-        .from("3cs-pdfs")
-        .upload(storagePath, buffer, {
-          contentType: "application/pdf",
-          upsert: true,
+        const buffer = await renderPersonPDFToBuffer({
+          personName: r.name,
+          culture: r.culture,
+          competence: r.competence,
+          commitment: r.commitment,
+          finalRating: r.finalRating,
+          grade: r.grade,
+          assessorEmail,
+          dateTime,
+          logoBase64,
         });
 
-      if (uploadError) {
-        console.error(`Failed to upload PDF for ${r.name}:`, uploadError);
-        // Continue — don't block the whole submission for one upload failure
-      }
+        // Upload to Supabase Storage
+        const storagePath = `${assessment.id}/${personId}.pdf`;
+        const { error: uploadError } = await supabase.storage
+          .from("3cs-pdfs")
+          .upload(storagePath, buffer, {
+            contentType: "application/pdf",
+            upsert: true,
+          });
 
-      // Record PDF artifact
-      await supabase.from("pdf_artifacts").insert({
-        assessment_person_id: personId,
-        storage_path: storagePath,
-      });
+        if (uploadError) {
+          console.error(`Failed to upload PDF for ${r.name}:`, uploadError);
+        }
 
-      pdfBuffers.push({
-        name: r.name,
-        buffer,
-        personId,
-      });
-    }
+        // Record PDF artifact
+        const { error: artifactError } = await supabase
+          .from("pdf_artifacts")
+          .insert({
+            assessment_person_id: personId,
+            storage_path: storagePath,
+          });
+
+        if (artifactError) {
+          console.error(`Failed to record PDF artifact for ${r.name}:`, artifactError);
+        }
+
+        return { name: r.name, buffer, personId };
+      })
+    );
 
     // 5. Send email with all PDFs attached
     const emailHTML = buildAssessmentEmailHTML({
@@ -155,6 +169,16 @@ export async function POST(request: NextRequest) {
       appUrl,
       dateTime,
     });
+
+    const responsePayload = {
+      sessionToken: assessment.session_token,
+      results: results.map((r) => ({
+        name: r.name,
+        finalRating: r.finalRating,
+        grade: r.grade,
+        guidance: r.guidanceSummary,
+      })),
+    };
 
     try {
       await sendAssessmentEmail({
@@ -168,28 +192,13 @@ export async function POST(request: NextRequest) {
       });
     } catch (emailError) {
       console.error("Email send failed:", emailError);
-      // Assessment is saved, but email failed — return success with warning
       return NextResponse.json({
-        sessionToken: assessment.session_token,
-        results: results.map((r) => ({
-          name: r.name,
-          finalRating: r.finalRating,
-          grade: r.grade,
-          guidance: generateGuidance(r.culture, r.competence, r.commitment, r.grade).summary,
-        })),
+        ...responsePayload,
         warning: "Assessment saved but email delivery failed. You can still view results via the history link.",
       });
     }
 
-    return NextResponse.json({
-      sessionToken: assessment.session_token,
-      results: results.map((r) => ({
-        name: r.name,
-        finalRating: r.finalRating,
-        grade: r.grade,
-        guidance: generateGuidance(r.culture, r.competence, r.commitment, r.grade).summary,
-      })),
-    });
+    return NextResponse.json(responsePayload);
   } catch (err) {
     console.error("Assessment submission error:", err);
     return NextResponse.json(

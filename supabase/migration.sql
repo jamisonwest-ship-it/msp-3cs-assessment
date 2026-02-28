@@ -45,21 +45,13 @@ CREATE INDEX IF NOT EXISTS idx_pdf_artifacts_person_id
 -- 4. Create storage bucket for PDFs (run via Supabase Dashboard or API)
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('3cs-pdfs', '3cs-pdfs', false);
 
--- 5. RLS policies (service role key bypasses these; they protect anon access)
+-- 5. RLS policies
+-- All reads AND writes now go through the service role key (server-side API routes).
+-- The anon key has NO access to any table. This prevents direct Supabase REST API
+-- abuse even though the anon key is exposed in NEXT_PUBLIC_* env vars.
 ALTER TABLE assessments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assessment_people ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pdf_artifacts ENABLE ROW LEVEL SECURITY;
 
--- Allow read access to assessments by session_token (for history page via anon key)
-CREATE POLICY "Allow read by session_token" ON assessments
-  FOR SELECT USING (true);
-
-CREATE POLICY "Allow read assessment_people" ON assessment_people
-  FOR SELECT USING (true);
-
-CREATE POLICY "Allow read pdf_artifacts" ON pdf_artifacts
-  FOR SELECT USING (true);
-
--- Note: All writes use the service role key (server-side only), bypassing RLS.
--- For v1 without auth, we allow SELECT for the anon key so the history page works.
--- The session_token itself acts as the access control (unguessable UUID).
+-- No SELECT/INSERT/UPDATE/DELETE policies for anon role.
+-- Service role key bypasses RLS entirely, which is all we need.

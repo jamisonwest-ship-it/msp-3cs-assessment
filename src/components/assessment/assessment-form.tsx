@@ -51,6 +51,7 @@ export function AssessmentForm() {
   );
 
   const resetAll = useCallback(() => {
+    if (!window.confirm("Reset all fields? This cannot be undone.")) return;
     setAssessorEmail("");
     setPeople([createPerson()]);
     setError(null);
@@ -60,6 +61,7 @@ export function AssessmentForm() {
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(assessorEmail);
   const scoredPeople = people.filter((p) => {
     if (!p.name.trim()) return false;
+    if (!p.cultureTouched || !p.competenceTouched || !p.commitmentTouched) return false;
     const score = computeScore({
       culture: p.culture,
       competence: p.competence,
@@ -205,7 +207,7 @@ export function AssessmentForm() {
               {!isValidEmail
                 ? "Enter a valid email to continue."
                 : scoredPeople.length === 0
-                ? "Add at least one person with a name to continue."
+                ? "Add at least one person with a name and adjust all three sliders."
                 : ""}
             </p>
           )}

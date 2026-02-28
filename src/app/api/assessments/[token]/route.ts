@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function GET(
   _request: NextRequest,
@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { token } = await params;
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseAdmin();
 
     // Fetch assessment by session token
     const { data: assessment, error: assessmentError } = await supabase
