@@ -69,7 +69,7 @@
 /* ──── Base ──── */
 
 body {
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, sans-serif;
   color: var(--th-text);
   background-color: var(--th-bg);
   -webkit-font-smoothing: antialiased;

@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "MSP+ 3Cs Assessment",
@@ -16,17 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
         <script
           dangerouslySetInnerHTML={{
             __html: `try{if(localStorage.getItem("theme")!=="light"){document.documentElement.classList.add("dark")}}catch(e){}`,
           }}
         />
       </head>
-      <body className="min-h-screen antialiased">
+      <body className={`${poppins.variable} min-h-screen antialiased`}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
