@@ -5,7 +5,17 @@
       "Bash(npm install)",
       "Bash(npx vitest run)",
       "Bash(npx next build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd full MSP+ 3Cs Assessment application\n\nComplete Next.js 15 app with assessment form, scoring engine,\nPDF report generation, email delivery, and history page.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(npx vercel:*)",
+      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:msp-3cs-assessment.vercel.app)",
+      "Bash(npm test:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cd:*)"
     ]
   }
 }

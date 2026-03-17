@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     const { assessorEmail, people } = parsed.data;
     const supabase = getSupabaseAdmin();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3401";
     const dateTime = new Date().toLocaleString("en-US", {
       dateStyle: "medium",
       timeStyle: "short",

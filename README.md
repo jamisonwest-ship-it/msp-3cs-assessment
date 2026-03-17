@@ -35,7 +35,7 @@ Required variables:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side only) |
 | `RESEND_API_KEY` | Resend API key for email delivery |
-| `NEXT_PUBLIC_APP_URL` | App URL (e.g., `http://localhost:3000` for dev) |
+| `NEXT_PUBLIC_APP_URL` | App URL (e.g., `http://localhost:3401` for dev) |
 
 ### 3. Set up Supabase
 
@@ -60,7 +60,7 @@ Required variables:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3401](http://localhost:3401).
 
 ### 6. Run tests
 
