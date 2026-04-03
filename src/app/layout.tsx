@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   title: "MSP+ 3Cs Assessment",
   description:
     "Evaluate Culture, Competence, and Commitment to determine fit and placement readiness.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
